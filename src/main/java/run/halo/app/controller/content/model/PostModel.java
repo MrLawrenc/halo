@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.cache.constant.CacheUtil;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -52,6 +53,8 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final CacheUtil cacheUtil;
+
     public PostModel(PostService postService,
                      ThemeService themeService,
                      PostCategoryService postCategoryService,
@@ -60,7 +63,8 @@ public class PostModel {
                      PostTagService postTagService,
                      TagService tagService,
                      OptionService optionService,
-                     AbstractStringCacheStore cacheStore) {
+                     AbstractStringCacheStore cacheStore,
+                     CacheUtil cacheUtil) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -70,6 +74,7 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.cacheUtil = cacheUtil;
     }
 
     public String content(Post post, String token, Model model) {
@@ -125,7 +130,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -139,6 +144,17 @@ public class PostModel {
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
+        /*
+        *         int pageSize = cacheUtil.getPageSize(() -> optionService.getPostPageSize() + "");
+        Pageable pageable = PageRequest
+                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+* */
+
+ /*       Page<PostListVO> posts1 = cacheUtil.getPagePostListVO(PostStatus.PUBLISHED, pageable.getPageNumber(), pageSize, () -> {
+            Page<Post> postPage1 = postService.pageBy(PostStatus.PUBLISHED, pageable);
+            return postService.convertToListVo(postPage);
+        });
+*/
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
@@ -150,7 +166,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 
