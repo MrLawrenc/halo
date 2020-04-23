@@ -38,7 +38,7 @@ public class LogAspect {
      * 日志切面
      */
     @Before("writeLog()")
-    public void Before(JoinPoint joinPoint) {
+    public void before(JoinPoint joinPoint) {
         StopWatch stopWatch = new StopWatch();
         stopWatchMap.put(Thread.currentThread().getId(), stopWatch);
         stopWatch.start("切面耗时");
@@ -46,15 +46,15 @@ public class LogAspect {
         StringBuilder sb = new StringBuilder("进入");
         Class<?> clz = joinPoint.getTarget().getClass();
         String methodName = joinPoint.getSignature().getName();
-        appendStr(sb, clz.getSimpleName(), "#", methodName, "方法\t");
+        appendStr(sb, "[",clz.getSimpleName(), "#", methodName, "方法]\t");
         String[] paramNames = getParamNames(clz, methodName);
         Object[] paramValues = joinPoint.getArgs();
         if (paramValues == null || paramValues.length == 0) {
             sb.append("--该方法无参数");
         } else {
-            for (int i = 0; i < paramValues.length; i++) {
+            for (int i = 0; i < paramNames.length; i++) {
                 Object obj = paramValues[i];
-                if (obj instanceof ServletRequest || obj instanceof ServletResponse || obj instanceof HttpSession) {
+                if ( obj instanceof ServletRequest || obj instanceof ServletResponse || obj instanceof HttpSession) {
                     continue;
                 }
                 String str = JSON.toJSONString(paramValues[i]);
