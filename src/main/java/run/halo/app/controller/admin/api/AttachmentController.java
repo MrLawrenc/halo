@@ -14,6 +14,7 @@ import run.halo.app.model.params.AttachmentParam;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.AttachmentService;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,10 @@ public class AttachmentController {
 
     public AttachmentController(AttachmentService attachmentService) {
         this.attachmentService = attachmentService;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
     }
 
     @GetMapping

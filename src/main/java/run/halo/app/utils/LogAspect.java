@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -46,15 +48,18 @@ public class LogAspect {
         StringBuilder sb = new StringBuilder("进入");
         Class<?> clz = joinPoint.getTarget().getClass();
         String methodName = joinPoint.getSignature().getName();
-        appendStr(sb, "[",clz.getSimpleName(), "#", methodName, "方法]\t");
+        appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "方法]\t");
         String[] paramNames = getParamNames(clz, methodName);
         Object[] paramValues = joinPoint.getArgs();
-        if (paramValues == null || paramValues.length == 0) {
+        if (paramValues == null || paramValues.length == 0|| Objects.isNull(paramNames)) {
             sb.append("--该方法无参数");
         } else {
             for (int i = 0; i < paramNames.length; i++) {
                 Object obj = paramValues[i];
-                if ( obj instanceof ServletRequest || obj instanceof ServletResponse || obj instanceof HttpSession) {
+                if (obj instanceof MultipartFile ||
+                        obj instanceof ServletRequest ||
+                        obj instanceof ServletResponse ||
+                        obj instanceof HttpSession) {
                     continue;
                 }
                 String str = JSON.toJSONString(paramValues[i]);
@@ -101,8 +106,8 @@ public class LogAspect {
     /**
      * 在sb之后追加拼接objects里面所有的字符串
      */
-    public static void appendStr(StringBuilder sb, String... strs) {
-        Arrays.asList(strs).forEach(sb::append);
+    public static void appendStr(StringBuilder sb, String... str) {
+        Arrays.asList(str).forEach(sb::append);
     }
 
     /**
