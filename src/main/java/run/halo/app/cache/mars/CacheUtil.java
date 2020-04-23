@@ -10,7 +10,6 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.utils.LogUtil;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -22,7 +21,10 @@ import java.util.function.Supplier;
 public class CacheUtil {
 
     private static final Cache<String, Object> BLOG_INDEX_CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(3, TimeUnit.MINUTES).build();
+            //超过会使用LRU回收策略
+            .maximumSize(10)
+            //.expireAfterWrite(3, TimeUnit.MINUTES)
+            .build();
 
     private final AbstractStringCacheStore cacheStore;
 
@@ -49,9 +51,14 @@ public class CacheUtil {
         return Integer.parseInt(result.toString());
     }
 
+    public void cleanPageSizeCache() {
+        BLOG_INDEX_CACHE.invalidate(PAGE_SIZE);
+    }
+
     /**
      * 博客查询结果
      */
+    @SuppressWarnings("all")
     public Page<PostListVO> getPagePostListVO(PostStatus status, int startPage, int pageSize, Supplier<Page<PostListVO>> supplier) {
         String key = status.getValue() + ":" + startPage + ":" + pageSize;
         Page<PostListVO> result = (Page<PostListVO>) BLOG_INDEX_CACHE.getIfPresent(key);
@@ -60,7 +67,7 @@ public class CacheUtil {
             result = supplier.get();
             BLOG_INDEX_CACHE.put(key, result);
         } else {
-            LogUtil.debugLog("命中缓存................");
+            LogUtil.debugLog("命中缓存.................");
         }
         return result;
     }

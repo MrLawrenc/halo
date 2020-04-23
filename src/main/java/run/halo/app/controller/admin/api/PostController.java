@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.cache.mars.CacheUtil;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -47,12 +48,16 @@ public class PostController {
 
     private final OptionService optionService;
 
+    private final CacheUtil cacheUtil;
+
     public PostController(PostService postService,
                           AbstractStringCacheStore cacheStore,
-                          OptionService optionService) {
+                          OptionService optionService,
+                          CacheUtil cacheUtil) {
         this.postService = postService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.cacheUtil = cacheUtil;
     }
 
     @GetMapping
@@ -105,6 +110,7 @@ public class PostController {
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        cacheUtil.cleanPageSizeCache();
         // Convert to
         Post post = postParam.convertTo();
         return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
@@ -125,8 +131,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/{status}")
     @ApiOperation("Updates post status")
     public BasePostMinimalDTO updateStatusBy(
-        @PathVariable("postId") Integer postId,
-        @PathVariable("status") PostStatus status) {
+            @PathVariable("postId") Integer postId,
+            @PathVariable("status") PostStatus status) {
         Post post = postService.updateStatus(status, postId);
 
         return new BasePostMinimalDTO().convertFrom(post);
@@ -142,8 +148,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-        @PathVariable("postId") Integer postId,
-        @RequestBody PostContentParam contentParam) {
+            @PathVariable("postId") Integer postId,
+            @RequestBody PostContentParam contentParam) {
         // Update draft content
         Post post = postService.updateDraftContent(contentParam.getContent(), postId);
 
@@ -186,10 +192,10 @@ public class PostController {
 
         if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
             previewUrl.append("&token=")
-                .append(token);
+                    .append(token);
         } else {
             previewUrl.append("?token=")
-                .append(token);
+                    .append(token);
         }
 
         // build preview post url and return

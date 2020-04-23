@@ -70,7 +70,7 @@ public class LogAspect {
         StopWatch stopWatch = stopWatchMap.get(Thread.currentThread().getId());
         if (stopWatch.isRunning()) {
             stopWatch.stop();
-            LogUtil.debugLog("耗时:{}s", stopWatch.getTotalTimeSeconds());
+            LogUtil.infoLog("耗时:{}s", stopWatch.getTotalTimeSeconds());
 //            LogUtil.debugLog(stopWatch.prettyPrint());
         }
     }

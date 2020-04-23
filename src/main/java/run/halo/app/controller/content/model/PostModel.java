@@ -137,13 +137,17 @@ public class PostModel {
         return themeService.render("post");
     }
 
+    /**
+     * <pre>
+     *     int pageSize = optionService.getPostPageSize();
+     *         Pageable pageable = PageRequest
+     *             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+     *
+     *        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+     *         Page<PostListVO> posts = postService.convertToListVo(postPage);
+     * </pre>
+     */
     public String list(Integer page, Model model) {
-   /*      int pageSize = optionService.getPostPageSize();
-        Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
-
-       Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);*/
 
         int pageSize = cacheUtil.getPageSize(optionService::getPostPageSize);
         Pageable pageable = PageRequest
