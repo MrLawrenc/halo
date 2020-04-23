@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.cache.constant.CacheUtil;
+import run.halo.app.cache.mars.CacheUtil;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -138,23 +138,21 @@ public class PostModel {
     }
 
     public String list(Integer page, Model model) {
-        int pageSize = optionService.getPostPageSize();
+   /*      int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
-        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
-        /*
-        *         int pageSize = cacheUtil.getPageSize(() -> optionService.getPostPageSize() + "");
+       Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);*/
+
+        int pageSize = cacheUtil.getPageSize(optionService::getPostPageSize);
         Pageable pageable = PageRequest
                 .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
-* */
 
- /*       Page<PostListVO> posts1 = cacheUtil.getPagePostListVO(PostStatus.PUBLISHED, pageable.getPageNumber(), pageSize, () -> {
-            Page<Post> postPage1 = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = cacheUtil.getPagePostListVO(PostStatus.PUBLISHED, pageable.getPageNumber(), pageSize, () -> {
+            Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
             return postService.convertToListVo(postPage);
         });
-*/
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);

@@ -5,12 +5,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,12 +22,12 @@ import java.util.Objects;
 /**
  * @author johnniang
  */
-@Aspect
-@Component
+/*@Aspect
+@Component*/
 @Slf4j
 public class ControllerLogAop {
 
-    @Pointcut("execution(*  *..*.*.controller..*.*(..))")
+    @Pointcut("execution(*  *..*.*.controller..*Controller.*(..))")
     public void controller() {
     }
 
