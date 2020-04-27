@@ -48,7 +48,7 @@ public class LogAspect {
         StringBuilder sb = new StringBuilder("进入");
         Class<?> clz = joinPoint.getTarget().getClass();
         String methodName = joinPoint.getSignature().getName();
-        appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "方法]\t");
+        appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "]方法\t");
         String[] paramNames = getParamNames(clz, methodName);
         Object[] paramValues = joinPoint.getArgs();
         if (paramValues == null || paramValues.length == 0|| Objects.isNull(paramNames)) {
