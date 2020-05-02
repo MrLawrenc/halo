@@ -51,10 +51,11 @@ public class LogAspect {
         appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "方法]\t");
         String[] paramNames = getParamNames(clz, methodName);
         Object[] paramValues = joinPoint.getArgs();
-        if (paramValues == null || paramValues.length == 0|| Objects.isNull(paramNames)) {
+        if (paramValues == null || paramValues.length == 0 || Objects.isNull(paramNames)) {
             sb.append("--该方法无参数");
         } else {
-            for (int i = 0; i < paramNames.length; i++) {
+            int min = Math.min(paramNames.length, paramValues.length);
+            for (int i = 0; i < min; i++) {
                 Object obj = paramValues[i];
                 if (obj instanceof MultipartFile ||
                         obj instanceof ServletRequest ||
