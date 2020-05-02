@@ -111,10 +111,11 @@ public class PostController {
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
-        publisher.publishEvent(new CacheEvent("add new blog , will update blog cache!"));
         // Convert to
         Post post = postParam.convertTo();
-        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
+        PostDetailVO result = postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
+        publisher.publishEvent(new CacheEvent("add new blog , will update blog cache!"));
+        return result;
     }
 
     @PutMapping("{postId:\\d+}")
