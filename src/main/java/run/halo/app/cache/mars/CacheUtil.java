@@ -51,8 +51,11 @@ public class CacheUtil {
         return Integer.parseInt(result.toString());
     }
 
-    public void cleanPageSizeCache() {
-        BLOG_INDEX_CACHE.invalidate(PAGE_SIZE);
+    /**
+     * 清除blog主页缓存
+     */
+    public void cleanBlogIndexCache() {
+        BLOG_INDEX_CACHE.invalidateAll();
     }
 
     /**

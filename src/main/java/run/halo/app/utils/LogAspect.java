@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,28 +46,33 @@ public class LogAspect {
         stopWatchMap.put(Thread.currentThread().getId(), stopWatch);
         stopWatch.start("切面耗时");
 
-        StringBuilder sb = new StringBuilder("进入");
-        Class<?> clz = joinPoint.getTarget().getClass();
-        String methodName = joinPoint.getSignature().getName();
-        appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "方法]\t");
-        String[] paramNames = getParamNames(clz, methodName);
-        Object[] paramValues = joinPoint.getArgs();
-        if (paramValues == null || paramValues.length == 0|| Objects.isNull(paramNames)) {
-            sb.append("--该方法无参数");
-        } else {
-            for (int i = 0; i < paramNames.length; i++) {
-                Object obj = paramValues[i];
-                if (obj instanceof MultipartFile ||
-                        obj instanceof ServletRequest ||
-                        obj instanceof ServletResponse ||
-                        obj instanceof HttpSession) {
-                    continue;
+        try {
+            StringBuilder sb = new StringBuilder("进入");
+            Class<?> clz = joinPoint.getTarget().getClass();
+            String methodName = joinPoint.getSignature().getName();
+            appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "]方法\t");
+            String[] paramNames = getParamNames(clz, methodName);
+            Object[] paramValues = joinPoint.getArgs();
+            if (paramValues == null || paramValues.length == 0 || Objects.isNull(paramNames)) {
+                sb.append("--该方法无参数");
+            } else {
+                for (int i = 0; i < paramNames.length; i++) {
+                    Object obj = paramValues[i];
+                    if (obj instanceof MultipartFile ||
+                            obj instanceof ServletRequest ||
+                            obj instanceof ServletResponse ||
+                            obj instanceof HttpSession ||
+                            obj instanceof Model) {
+                        continue;
+                    }
+                    String str = JSON.toJSONString(paramValues[i]);
+                    appendStr(sb, "方法参数", paramNames[i], "的值是:", str, "\t");
                 }
-                String str = JSON.toJSONString(paramValues[i]);
-                appendStr(sb, "方法参数", paramNames[i], "的值是:", str, "\t");
             }
+            LogUtil.infoLog(sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        LogUtil.infoLog(sb.toString());
     }
 
 

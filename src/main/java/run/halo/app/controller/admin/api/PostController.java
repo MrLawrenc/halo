@@ -2,12 +2,13 @@ package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.cache.mars.CacheUtil;
+import run.halo.app.event.cache.CacheEvent;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -48,16 +49,16 @@ public class PostController {
 
     private final OptionService optionService;
 
-    private final CacheUtil cacheUtil;
+    private ApplicationEventPublisher publisher;
 
     public PostController(PostService postService,
                           AbstractStringCacheStore cacheStore,
                           OptionService optionService,
-                          CacheUtil cacheUtil) {
+                          ApplicationEventPublisher publisher) {
         this.postService = postService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
-        this.cacheUtil = cacheUtil;
+        this.publisher = publisher;
     }
 
     @GetMapping
@@ -110,7 +111,7 @@ public class PostController {
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
-        cacheUtil.cleanPageSizeCache();
+        publisher.publishEvent(new CacheEvent("add new blog , will update blog cache!"));
         // Convert to
         Post post = postParam.convertTo();
         return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
