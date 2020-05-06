@@ -4,6 +4,16 @@ server:
   compression:
     enabled: false
 spring:
+#  nacos 相关
+  cloud:
+    nacos:
+      discovery:
+        register-enabled: true
+        server-addr: 47.96.158.220:8850
+        namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
+  application:
+    name: halo-blog
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   devtools:
@@ -57,6 +67,9 @@ logging:
 
 halo:
   download-timeout: 5m
+  upload:
+    user: lmy
+    pwd: 123456
 
 application:
   version: ${version}

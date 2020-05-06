@@ -3,9 +3,13 @@ package run.halo.app.controller.admin.api.facade;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.controller.admin.api.facade.entity.ImgFileDTO;
 import run.halo.app.controller.admin.api.facade.entity.MockMultipartFile;
 import run.halo.app.controller.admin.api.facade.entity.Resp;
 import run.halo.app.service.AttachmentService;
@@ -24,22 +28,36 @@ import java.time.format.DateTimeFormatter;
  * 不走api接口，越过鉴权过滤器
  */
 @RestController
+@RefreshScope
 @RequestMapping("/facade/admin/attachments")
 public class AttachmentController4Service {
-    private final AttachmentService attachmentService;
     private static HttpClient client = HttpClient.newBuilder().build();
+
+    private final AttachmentService attachmentService;
+    @Value("${halo.upload.user:lmy}")
+    private String user;
+    @Value("${halo.upload.pwd:123lmy}")
+    private String pwd;
 
 
     public AttachmentController4Service(AttachmentService attachmentService) {
         this.attachmentService = attachmentService;
     }
 
-    @GetMapping("upload")
+    @PostMapping("upload")
     @ApiOperation("对外开放的文件上传接口")
     @ApiImplicitParams({@ApiImplicitParam(name = "url", value = "需要上传的图片文件地址")})
-    public Resp uploadAttachment(String url) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
+    public Resp uploadAttachment(@RequestBody ImgFileDTO imgFileDTO) throws Exception {
+        String imgUrl;
+        try {
+            imgUrl = imgFileDTO.service(user, pwd);
+        } catch (Exception e) {
+            return Resp.fail(e.getMessage());
+        }
+
+        HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(imgUrl)).build();
         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        //上传图片
         String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         MockMultipartFile multipartFile = new MockMultipartFile("file", format + ".jpg", "image/jpeg", response.body());
         attachmentService.upload(multipartFile);

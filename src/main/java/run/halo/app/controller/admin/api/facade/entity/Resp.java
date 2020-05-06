@@ -20,4 +20,7 @@ public class Resp {
     public static Resp success() {
         return new Resp().setSuccess(true).setCode(200).setDesc("成功");
     }
+    public static Resp fail(String msg) {
+        return new Resp().setSuccess(false).setCode(500).setDesc(msg);
+    }
 }
