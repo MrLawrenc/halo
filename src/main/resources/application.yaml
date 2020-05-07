@@ -4,7 +4,8 @@ server:
   compression:
     enabled: false
 spring:
-
+  level:
+    com.alibaba.nacos.client.naming: WARN
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   devtools:

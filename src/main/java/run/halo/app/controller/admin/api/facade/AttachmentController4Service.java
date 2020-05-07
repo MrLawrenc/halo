@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.controller.admin.api.facade.entity.ImgFileDTO;
 import run.halo.app.controller.admin.api.facade.entity.MockMultipartFile;
@@ -29,7 +28,6 @@ import java.time.format.DateTimeFormatter;
  */
 @RestController
 @RefreshScope
-@RequestMapping("/facade/admin/attachments")
 public class AttachmentController4Service {
     private static HttpClient client = HttpClient.newBuilder().build();
 
@@ -44,7 +42,7 @@ public class AttachmentController4Service {
         this.attachmentService = attachmentService;
     }
 
-    @PostMapping("upload")
+    @PostMapping("/facade/uploadImg")
     @ApiOperation("对外开放的文件上传接口")
     @ApiImplicitParams({@ApiImplicitParam(name = "url", value = "需要上传的图片文件地址")})
     public Resp uploadAttachment(@RequestBody ImgFileDTO imgFileDTO) throws Exception {

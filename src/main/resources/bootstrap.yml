@@ -1,8 +1,8 @@
 spring:
-  profiles:
-    active: lmy # 表示开发环境
-    #    active: test # 表示测试环境
-    #active: info
+#  profiles:
+#    active: lmy # 表示开发环境
+#    #    active: test # 表示测试环境
+#    #active: info
   application:
     name: halo-blog
   cloud:
