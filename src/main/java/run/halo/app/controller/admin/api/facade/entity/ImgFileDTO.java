@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 public class ImgFileDTO extends BaseDTO<String> {
 
+
     /**
      * 获取图片url
      */
@@ -17,4 +18,5 @@ public class ImgFileDTO extends BaseDTO<String> {
     public String service(@NotNull String user, @NotNull String pwd) throws Exception {
         return validate(user, pwd);
     }
+
 }

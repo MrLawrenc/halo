@@ -1,5 +1,6 @@
 package run.halo.app.controller.admin.api.facade;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -45,12 +46,14 @@ public class AttachmentController4Service {
     @PostMapping("/facade/uploadImg")
     @ApiOperation("对外开放的文件上传接口")
     @ApiImplicitParams({@ApiImplicitParam(name = "url", value = "需要上传的图片文件地址")})
-    public Resp uploadAttachment(@RequestBody ImgFileDTO imgFileDTO) throws Exception {
+    public String uploadAttachment(@RequestBody String data) throws Exception {
+        ImgFileDTO fileDTO = new ImgFileDTO();
+        fileDTO.setData(data);
         String imgUrl;
         try {
-            imgUrl = imgFileDTO.service(user, pwd);
+            imgUrl = fileDTO.service(user, pwd);
         } catch (Exception e) {
-            return Resp.fail(e.getMessage());
+            return JSON.toJSONString(Resp.fail(e.getMessage()));
         }
 
         HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(imgUrl)).build();
@@ -59,6 +62,6 @@ public class AttachmentController4Service {
         String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         MockMultipartFile multipartFile = new MockMultipartFile("file", format + ".jpg", "image/jpeg", response.body());
         attachmentService.upload(multipartFile);
-        return Resp.success();
+        return JSON.toJSONString(Resp.success());
     }
 }

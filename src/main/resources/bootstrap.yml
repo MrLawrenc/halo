@@ -18,7 +18,9 @@ spring:
         # 命名空间  不配置 nacos会读取默认命名空间 public
         namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
 
-management:
+# 指定了服务注册的ip地址，当其他消费者访问的时候，不会出现当前服务注册的ip是内网ip，即系统自动获取的ip
+    inetutils:
+      preferred-networks: 47.96
   endpoints:
     web:
       exposure:

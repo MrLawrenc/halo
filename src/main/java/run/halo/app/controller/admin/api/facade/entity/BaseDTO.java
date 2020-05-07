@@ -1,5 +1,7 @@
 package run.halo.app.controller.admin.api.facade.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import run.halo.app.controller.admin.api.facade.util.RSAUtil;
 
 import javax.validation.constraints.NotNull;
@@ -9,6 +11,7 @@ import javax.validation.constraints.NotNull;
  * @date : 2020/5/6 17:42
  * @description : 传输对象基类
  */
+@Getter@Setter
 public abstract class BaseDTO<T> {
     /**
      * 分隔符，user#pwd#data ，data为加密之后的数据
