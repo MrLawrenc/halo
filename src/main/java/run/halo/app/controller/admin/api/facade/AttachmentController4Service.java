@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.controller.admin.api.facade.entity.ImgFileDTO;
 import run.halo.app.controller.admin.api.facade.entity.MockMultipartFile;
@@ -20,6 +20,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author : MrLawrenc
@@ -38,6 +40,9 @@ public class AttachmentController4Service {
     @Value("${halo.upload.pwd:123lmy}")
     private String pwd;
 
+    public void print() {
+        System.out.println("user:" + user + "  pwd:" + pwd);
+    }
 
     public AttachmentController4Service(AttachmentService attachmentService) {
         this.attachmentService = attachmentService;
@@ -46,12 +51,16 @@ public class AttachmentController4Service {
     @PostMapping("/facade/uploadImg")
     @ApiOperation("对外开放的文件上传接口")
     @ApiImplicitParams({@ApiImplicitParam(name = "url", value = "需要上传的图片文件地址")})
-    public String uploadAttachment(@RequestBody String data) throws Exception {
+    public String uploadAttachment(@RequestParam("data") String data) throws Exception {
+        print();
         ImgFileDTO fileDTO = new ImgFileDTO();
         fileDTO.setData(data);
         String imgUrl;
         try {
             imgUrl = fileDTO.service(user, pwd);
+            if (Objects.isNull(imgUrl)) {
+                return JSON.toJSONString(Resp.fail("鉴权失败！"));
+            }
         } catch (Exception e) {
             return JSON.toJSONString(Resp.fail(e.getMessage()));
         }
@@ -61,7 +70,7 @@ public class AttachmentController4Service {
         //上传图片
         String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         MockMultipartFile multipartFile = new MockMultipartFile("file", format + ".jpg", "image/jpeg", response.body());
-        attachmentService.upload(multipartFile);
+        CompletableFuture.runAsync(() -> attachmentService.upload(multipartFile));
         return JSON.toJSONString(Resp.success());
     }
 }

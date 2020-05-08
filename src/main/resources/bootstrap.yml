@@ -4,7 +4,7 @@ spring:
 #    #    active: test # 表示测试环境
 #    #active: info
   application:
-    name: halo-blog
+    name: halo-blog-test
   cloud:
     nacos:
       discovery:
