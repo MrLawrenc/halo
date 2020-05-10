@@ -114,7 +114,7 @@ public class PostController {
         // Convert to
         Post post = postParam.convertTo();
         PostDetailVO result = postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
-        publisher.publishEvent(new CacheEvent("add new blog , will update blog cache!"));
+        publisher.publishEvent(new CacheEvent(" will update blog cache, because add new blog "));
         return result;
     }
 
@@ -125,7 +125,7 @@ public class PostController {
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
-        publisher.publishEvent(new CacheEvent("blog will update"));
+        publisher.publishEvent(new CacheEvent("cache will update because blog changed"));
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
     }
@@ -136,7 +136,7 @@ public class PostController {
             @PathVariable("postId") Integer postId,
             @PathVariable("status") PostStatus status) {
         Post post = postService.updateStatus(status, postId);
-
+        publisher.publishEvent(new CacheEvent("cache update because blog state changed "));
         return new BasePostMinimalDTO().convertFrom(post);
     }
 
