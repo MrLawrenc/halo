@@ -125,7 +125,7 @@ public class PostController {
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
-
+        publisher.publishEvent(new CacheEvent("blog will update"));
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
     }
