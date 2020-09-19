@@ -17,7 +17,6 @@ import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
@@ -74,6 +73,7 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.cacheUtil=cacheUtil;
     }
 
     public String content(Post post, String token, Model model) {
@@ -136,12 +136,21 @@ public class PostModel {
     }
 
     public String list(Integer page, Model model) {
-        int pageSize = optionService.getPostPageSize();
+   /*      int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
-        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+       Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);*/
+
+        int pageSize = cacheUtil.getPageSize(optionService::getPostPageSize);
+        Pageable pageable = PageRequest
+                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+
+        Page<PostListVO> posts = cacheUtil.getPagePostListVO(PostStatus.PUBLISHED, pageable.getPageNumber(), pageSize, () -> {
+            Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+            return postService.convertToListVo(postPage);
+        });
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);

@@ -2,11 +2,13 @@ package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.event.cache.CacheEvent;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;

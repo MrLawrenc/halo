@@ -148,6 +148,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     Page<POST> pageBy(@NonNull Pageable pageable);
 
     /**
+     * Increases post visits.
+     *
+     * @param visits visits must not be less than 1
+     * @param postId post id must not be null
+     */
+    void increaseVisit(long visits, @NonNull Integer postId);
+
+    /**
      * Lists by status.
      *
      * @param status   post status must not be null
@@ -156,14 +164,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     Page<POST> pageBy(@NonNull PostStatus status, @NonNull Pageable pageable);
-
-    /**
-     * Increases post visits.
-     *
-     * @param visits visits must not be less than 1
-     * @param postId post id must not be null
-     */
-    void increaseVisit(long visits, @NonNull Integer postId);
 
     /**
      * Increase post likes.

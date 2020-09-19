@@ -71,6 +71,7 @@ ext {
 }
 
 dependencies {
+    implementation "com.alibaba:fastjson:1.2.73"
     implementation "org.kohsuke:github-api:$githubApiVersion"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
