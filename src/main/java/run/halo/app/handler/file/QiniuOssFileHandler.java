@@ -32,7 +32,8 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import static run.halo.app.handler.file.FileHandler.isImageType;
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.*;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 /**
  * Qiniu oss file handler.
@@ -78,11 +79,11 @@ public class QiniuOssFileHandler implements FileHandler {
         String uploadToken = auth.uploadToken(bucket, null, 60 * 60, putPolicy);
 
         // Create temp path
-        Path tmpPath = Paths.get(System.getProperty("java.io.tmpdir"), bucket);
+        Path tmpPath = Paths.get(ensureSuffix(TEMP_DIR, FILE_SEPARATOR), bucket);
 
         StringBuilder basePath = new StringBuilder(protocol)
-            .append(domain)
-            .append(URL_SEPARATOR);
+                .append(domain)
+                .append(URL_SEPARATOR);
 
         try {
             String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
@@ -91,13 +92,13 @@ public class QiniuOssFileHandler implements FileHandler {
             StringBuilder upFilePath = new StringBuilder();
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                    .append(URL_SEPARATOR);
+                        .append(URL_SEPARATOR);
             }
             upFilePath.append(basename)
-                .append("_")
-                .append(timestamp)
-                .append(".")
-                .append(extension);
+                    .append("_")
+                    .append(timestamp)
+                    .append(".")
+                    .append(extension);
 
             // Get file recorder for temp directory
             FileRecorder fileRecorder = new FileRecorder(tmpPath.toFile());

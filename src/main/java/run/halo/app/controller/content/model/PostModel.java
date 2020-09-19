@@ -74,7 +74,6 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
-        this.cacheUtil = cacheUtil;
     }
 
     public String content(Post post, String token, Model model) {
@@ -101,9 +100,8 @@ public class PostModel {
 
         postService.publishVisitEvent(post.getId());
 
-        AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
+        postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
@@ -137,26 +135,13 @@ public class PostModel {
         return themeService.render("post");
     }
 
-    /**
-     * <pre>
-     *     int pageSize = optionService.getPostPageSize();
-     *         Pageable pageable = PageRequest
-     *             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
-     *
-     *        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-     *         Page<PostListVO> posts = postService.convertToListVo(postPage);
-     * </pre>
-     */
     public String list(Integer page, Model model) {
-
-        int pageSize = cacheUtil.getPageSize(optionService::getPostPageSize);
+        int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
-        Page<PostListVO> posts = cacheUtil.getPagePostListVO(PostStatus.PUBLISHED, pageable.getPageNumber(), pageSize, () -> {
-            Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-            return postService.convertToListVo(postPage);
-        });
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
@@ -168,7 +153,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

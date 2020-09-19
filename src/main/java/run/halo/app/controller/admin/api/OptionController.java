@@ -1,12 +1,11 @@
 package run.halo.app.controller.admin.api;
 
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.annotation.DisableOnCondition;
+import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
@@ -58,15 +57,14 @@ public class OptionController {
 
     @PostMapping("map_view/keys")
     @ApiOperation("Lists options with map view by keys")
-    public Map<String, Object> listAllWithMapView(@RequestBody String keys) {
-        List<String> parsedKeys = JSON.parseArray(keys, String.class);
-        return optionService.listOptions(parsedKeys);
+    public Map<String, Object> listAllWithMapView(@RequestBody List<String> keys) {
+        return optionService.listOptions(keys);
     }
 
     @GetMapping("list_view")
     @ApiOperation("Lists all options with list view")
     public Page<OptionSimpleDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                                     OptionQuery optionQuery) {
+            OptionQuery optionQuery) {
         return optionService.pageDtosBy(pageable, optionQuery);
     }
 
@@ -88,7 +86,7 @@ public class OptionController {
     @ApiOperation("Updates option")
     @DisableOnCondition
     public void updateBy(@PathVariable("optionId") Integer optionId,
-                         @RequestBody @Valid OptionParam optionParam) {
+            @RequestBody @Valid OptionParam optionParam) {
         optionService.update(optionId, optionParam);
     }
 

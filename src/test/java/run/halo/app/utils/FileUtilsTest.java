@@ -1,13 +1,13 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import run.halo.app.model.support.HaloConst;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,17 +16,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author johnniang
  * @date 19-4-19
  */
 @Slf4j
-public class FileUtilsTest {
+class FileUtilsTest {
 
     @Test
-    public void deleteFolder() throws IOException {
+    void deleteFolder() throws IOException {
         // Create a temp folder
         Path tempDirectory = Files.createTempDirectory("halo-test");
 
@@ -38,35 +38,35 @@ public class FileUtilsTest {
         try (Stream<Path> pathStream = Files.walk(tempDirectory)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
             walkList.forEach(path -> log.debug(path.toString()));
-            Assert.assertThat(walkList.size(), equalTo(4));
+            assertEquals(4, walkList.size());
         }
 
         try (Stream<Path> pathStream = Files.walk(tempDirectory, 1)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
             walkList.forEach(path -> log.debug(path.toString()));
-            Assert.assertThat(walkList.size(), equalTo(2));
+            assertEquals(2, walkList.size());
         }
 
         try (Stream<Path> pathStream = Files.list(tempDirectory)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
             walkList.forEach(path -> log.debug(path.toString()));
-            Assert.assertThat(walkList.size(), equalTo(1));
+            assertEquals(1, walkList.size());
         }
 
         try (Stream<Path> pathStream = Files.list(testPath)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
             walkList.forEach(path -> log.debug(path.toString()));
-            Assert.assertThat(walkList.size(), equalTo(0));
+            assertEquals(0, walkList.size());
         }
 
         // Delete it
         FileUtils.deleteFolder(tempDirectory);
 
-        Assert.assertTrue(Files.notExists(tempDirectory));
+        assertTrue(Files.notExists(tempDirectory));
     }
 
     @Test
-    public void zipFolderTest() throws IOException {
+    void zipFolderTest() throws IOException {
         // Create some temporary files
         Path rootFolder = Files.createTempDirectory("zip-root-");
         log.debug("Folder name: [{}]", rootFolder.getFileName());
@@ -90,13 +90,13 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void tempFolderTest() {
+    void tempFolderTest() {
         log.debug(HaloConst.TEMP_DIR);
     }
 
     @Test
-    @Ignore
-    public void dbFileReadTest() throws IOException {
+    @Disabled("Due to depend on halo.mv.db file")
+    void dbFileReadTest() throws IOException {
         Path dbPath = Paths.get(HaloConst.USER_HOME + "/halo-test/db/halo.mv.db");
 
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(dbPath.toString(), "r")) {
@@ -107,5 +107,91 @@ public class FileUtilsTest {
             String bufString = new String(buffer);
             log.debug("Buffer String: [{}]", bufString);
         }
+    }
+
+    @Test
+    void testRenameFile() throws IOException {
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPath = tempDirectory.resolve("test/test");
+        Path filePath = tempDirectory.resolve("test/test/test.file");
+
+        // Create a temp file and folder
+        Files.createDirectories(testPath);
+        Files.createFile(filePath);
+
+        // Write content to the temp file
+        String content = "Test Content!\n";
+        Files.write(filePath, content.getBytes());
+
+        // Rename temp file
+        FileUtils.rename(filePath, "newName");
+        Path newPath = filePath.resolveSibling("newName");
+
+        assertFalse(Files.exists(filePath));
+        assertTrue(Files.isRegularFile(newPath));
+        assertEquals(content, new String(Files.readAllBytes(newPath)));
+
+        FileUtils.deleteFolder(tempDirectory);
+    }
+
+    @Test
+    void testRenameFolder() throws IOException {
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPath = tempDirectory.resolve("test/test");
+        Path filePath = tempDirectory.resolve("test/test.file");
+
+        // Create a temp file and folder
+        Files.createDirectories(testPath);
+        Files.createFile(filePath);
+
+        // Rename temp folder
+        FileUtils.rename(tempDirectory.resolve("test"), "newName");
+        Path newPath = tempDirectory.resolve("newName");
+
+        assertTrue(Files.isDirectory(newPath));
+        assertTrue(Files.isRegularFile(newPath.resolve("test.file")));
+
+        FileUtils.deleteFolder(tempDirectory);
+    }
+
+    @Test
+    void testRenameRepeat() throws IOException {
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPathOne = tempDirectory.resolve("test/testOne");
+        Path testPathTwo = tempDirectory.resolve("test/testTwo");
+        Path filePathOne = tempDirectory.resolve("test/testOne.file");
+        Path filePathTwo = tempDirectory.resolve("test/testTwo.file");
+
+        // Create temp files and folders
+        Files.createDirectories(testPathOne);
+        Files.createDirectories(testPathTwo);
+        Files.createFile(filePathOne);
+        Files.createFile(filePathTwo);
+
+        try {
+            FileUtils.rename(testPathOne, "testTwo");
+        } catch (Exception e) {
+            assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        try {
+            FileUtils.rename(filePathOne, "testTwo.file");
+        } catch (Exception e) {
+            assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        try {
+            FileUtils.rename(filePathOne, "testOne");
+        } catch (Exception e) {
+            assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        FileUtils.deleteFolder(tempDirectory);
     }
 }

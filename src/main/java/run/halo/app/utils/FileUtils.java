@@ -10,6 +10,7 @@ import run.halo.app.exception.ForbiddenException;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -72,9 +73,27 @@ public class FileUtils {
 
         // Delete folder recursively
         org.eclipse.jgit.util.FileUtils.delete(deletingPath.toFile(),
-            org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
+                org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
 
         log.info("Deleted [{}] successfully", deletingPath);
+    }
+
+    /**
+     * Renames file or folder.
+     *
+     * @param pathToRename file path to rename must not be null
+     * @param newName      new name must not be null
+     */
+    public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
+        Assert.notNull(pathToRename, "File path to rename must not be null");
+        Assert.notNull(newName, "New name must not be null");
+
+        Path newPath = pathToRename.resolveSibling(newName);
+        log.info("Rename [{}] to [{}]", pathToRename, newPath);
+
+        Files.move(pathToRename, newPath);
+
+        log.info("Rename [{}] successfully", pathToRename);
     }
 
     /**
@@ -112,6 +131,19 @@ public class FileUtils {
             }
 
             zipEntry = zis.getNextEntry();
+        }
+        File targetDir = targetPath.toFile();
+        List<File> files = Arrays.asList(targetDir.listFiles());
+        // if zip file has root file
+        if (files.size() == 1 && files.get(0).isDirectory()) {
+            String rootPath = files.get(0).toPath().toString();
+            String rootFile = rootPath.substring(rootPath.lastIndexOf("/") + 1);
+            File[] propertyFiles = files.get(0).listFiles();
+            for (File propertyFile : propertyFiles) {
+                String filePath = propertyFile.toPath().toString();
+                String destPath = filePath.replace(rootFile, "");
+                Files.copy(propertyFile.toPath(), Paths.get(destPath));
+            }
         }
     }
 

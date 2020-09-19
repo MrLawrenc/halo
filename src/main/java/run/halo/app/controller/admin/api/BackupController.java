@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.service.BackupService;
@@ -35,7 +35,7 @@ public class BackupController {
     private final HaloProperties haloProperties;
 
     public BackupController(BackupService backupService,
-                            HaloProperties haloProperties) {
+            HaloProperties haloProperties) {
         this.backupService = backupService;
         this.haloProperties = haloProperties;
     }
@@ -72,9 +72,9 @@ public class BackupController {
         }
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(contentType))
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
-            .body(backupResource);
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
+                .body(backupResource);
     }
 
     @DeleteMapping("work-dir")
@@ -128,8 +128,8 @@ public class BackupController {
         }
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(contentType))
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportDataResource.getFilename() + "\"")
-            .body(exportDataResource);
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportDataResource.getFilename() + "\"")
+                .body(exportDataResource);
     }
 }

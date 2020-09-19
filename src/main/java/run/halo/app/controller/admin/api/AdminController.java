@@ -4,9 +4,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.Application;
+import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
-import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.LoginPreCheckDTO;
 import run.halo.app.model.dto.StatisticDTO;
@@ -112,27 +111,6 @@ public class AdminController {
     @Deprecated
     public void updateAdmin() {
         adminService.updateAdminAssets();
-    }
-
-    @GetMapping("spring/application.yaml")
-    @ApiOperation("Gets application config content")
-    @DisableOnCondition
-    public BaseResponse<String> getSpringApplicationConfig() {
-        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getApplicationConfig());
-    }
-
-    @PutMapping("spring/application.yaml")
-    @ApiOperation("Updates application config content")
-    @DisableOnCondition
-    public void updateSpringApplicationConfig(@RequestParam(name = "content") String content) {
-        adminService.updateApplicationConfig(content);
-    }
-
-    @PostMapping(value = {"halo/restart", "spring/restart"})
-    @ApiOperation("Restarts halo server")
-    @DisableOnCondition
-    public void restartApplication() {
-        Application.restart();
     }
 
     @GetMapping(value = "halo/logfile")

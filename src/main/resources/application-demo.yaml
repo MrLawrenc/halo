@@ -62,4 +62,4 @@ halo:
   auth-enabled: true
   mode: demo
   workDir: ${user.home}/halo-demo/
-  cache: level
+  cache: memory
