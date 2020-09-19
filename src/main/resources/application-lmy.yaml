@@ -60,9 +60,6 @@ logging:
 
 halo:
   download-timeout: 5m
-  upload:
-    user: lmy
-    pwd: 123456
 
 application:
   version: ${version}

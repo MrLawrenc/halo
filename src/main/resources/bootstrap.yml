@@ -11,7 +11,7 @@ spring:
         ip: 47.96.158.220
       config:
         server-addr: 47.96.158.220:8849 #Nacos作为配置中心地址
-        file-extension: yml #指定yaml格式的配置
+        file-extension: yml #指定yaml格式的配置 dataid后缀也必须是yml
         # 分组 不配置 nacos会读取默认分组 DEFAULT_GROUP
         group: HALO_BLOG_GROUP
         # 命名空间  不配置 nacos会读取默认命名空间 public
