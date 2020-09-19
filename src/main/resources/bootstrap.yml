@@ -1,26 +1,23 @@
 spring:
-#  profiles:
-#    active: lmy # 表示开发环境
-#    #    active: test # 表示测试环境
-#    #active: info
-#  application:
-#    name: halo-blog
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: 47.96.158.220:8850 #配置Nacos地址
-#        namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
-##        固定ip，不让nacos自动获取，一般是拿eth0地址，端口可以自动嗅探
-#        ip: 47.96.158.220
-#      config:
-#        server-addr: 47.96.158.220:8850 #Nacos作为配置中心地址
-#        file-extension: yml #指定yaml格式的配置
-#        # 分组 不配置 nacos会读取默认分组 DEFAULT_GROUP
-#        group: HALO_BLOG_GROUP
-#        # 命名空间  不配置 nacos会读取默认命名空间 public
-#        namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
+  # 生产使用默认配置即可，本地测试使用lmy分支
+  profiles:
+    active: lmy # 表示本地开发环境
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 47.96.158.220:8849 #配置Nacos地址
+        namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
+#        固定ip，不让nacos自动获取，一般是拿eth0地址，端口可以自动嗅探
+        ip: 47.96.158.220
+      config:
+        server-addr: 47.96.158.220:8849 #Nacos作为配置中心地址
+        file-extension: yml #指定yaml格式的配置
+        # 分组 不配置 nacos会读取默认分组 DEFAULT_GROUP
+        group: HALO_BLOG_GROUP
+        # 命名空间  不配置 nacos会读取默认命名空间 public
+        namespace: ebdbe13e-38c7-4c6d-8eff-914d89576144
 
-  endpoints:
-    web:
-      exposure:
-        include: '*'
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'

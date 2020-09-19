@@ -1,10 +1,13 @@
+# 本地测试使用配置
+
 server:
   port: 8090
   forward-headers-strategy: native
   compression:
     enabled: false
 spring:
-
+  application:
+    name: halo-blog-local
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   devtools:

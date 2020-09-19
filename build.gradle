@@ -71,7 +71,11 @@ ext {
 }
 
 dependencies {
+    // 额外引入包
     implementation "com.alibaba:fastjson:1.2.73"
+    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2.2.0.RELEASE"
+    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.1.RELEASE"
+
     implementation "org.kohsuke:github-api:$githubApiVersion"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
