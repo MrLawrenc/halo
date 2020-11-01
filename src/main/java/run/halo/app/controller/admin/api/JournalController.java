@@ -37,7 +37,7 @@ public class JournalController {
     @GetMapping
     @ApiOperation("Lists journals")
     public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-            JournalQuery journalQuery) {
+                                               JournalQuery journalQuery) {
         Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
         return journalService.convertToCmtCountDto(journalPage);
     }
@@ -59,7 +59,7 @@ public class JournalController {
     @PutMapping("{id:\\d+}")
     @ApiOperation("Updates a Journal")
     public JournalDTO updateBy(@PathVariable("id") Integer id,
-            @RequestBody @Valid JournalParam journalParam) {
+                               @RequestBody @Valid JournalParam journalParam) {
         Journal journal = journalService.getById(id);
         journalParam.update(journal);
         Journal updatedJournal = journalService.updateBy(journal);
@@ -72,4 +72,24 @@ public class JournalController {
         Journal deletedJournal = journalService.removeById(journalId);
         return journalService.convertTo(deletedJournal);
     }
+
+
+    @GetMapping
+    @ApiOperation("heart")
+    public String heart() {
+        return "喜欢";
+    }
+
+    @GetMapping
+    @ApiOperation("share")
+    public String share() {
+        return "分享";
+    }
+
+    @GetMapping
+    @ApiOperation("comment")
+    public String comment() {
+        return "评论";
+    }
+
 }
