@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
@@ -139,7 +140,7 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
     }
 
     @Override
-    public void upload(String basePath, MultipartFile file) {
+    public void upload(String basePath, @NotNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
         Path uploadPath;

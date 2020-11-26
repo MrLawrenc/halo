@@ -10,10 +10,14 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.controller.admin.api.JournalController;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -41,12 +45,29 @@ public class LogAspect {
      */
     @Before("writeLog()")
     public void before(JoinPoint joinPoint) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        String requestURI = request.getRequestURI();
+
+
+
         StopWatch stopWatch = new StopWatch();
         stopWatchMap.put(Thread.currentThread().getId(), stopWatch);
         stopWatch.start("切面耗时");
 
         StringBuilder sb = new StringBuilder("进入");
         Class<?> clz = joinPoint.getTarget().getClass();
+
+
+        //忽略不同classloader差异
+        if (clz.getName().equals(JournalController.class.getName())){
+            //对日志做个简单拦截
+            String pwd = request.getParameter("pwd");
+            if (!requestURI.contains("admin")&&!"lmy".equals(pwd)){
+                throw new RuntimeException("没有访问权限!");
+            }
+        }
+
         String methodName = joinPoint.getSignature().getName();
         appendStr(sb, "[", clz.getSimpleName(), "#", methodName, "]方法\t");
         String[] paramNames = getParamNames(clz, methodName);
@@ -77,7 +98,7 @@ public class LogAspect {
         if (stopWatch.isRunning()) {
             stopWatch.stop();
             LogUtil.infoLog("耗时:{}s", stopWatch.getTotalTimeSeconds());
-//            LogUtil.debugLog(stopWatch.prettyPrint());
+            stopWatchMap.remove(Thread.currentThread().getId());
         }
     }
 
