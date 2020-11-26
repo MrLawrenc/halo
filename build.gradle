@@ -1,23 +1,21 @@
 plugins {
-    id "org.springframework.boot" version "2.2.5.RELEASE"
+    id "org.springframework.boot" version "2.3.1.RELEASE"
     id "io.spring.dependency-management" version "1.0.9.RELEASE"
     id "checkstyle"
     id "java"
 }
 
 group = "run.halo.app"
-version = "1.3.2"
+version = "1.4.0-beta.3"
 description = "Halo, An excellent open source blog publishing application."
 
 java {
     archivesBaseName = "halo"
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
 
 repositories {
+    mavenLocal()
     maven {
         url "https://maven.aliyun.com/nexus/content/groups/public"
     }
@@ -29,69 +27,67 @@ configurations {
     implementation {
         exclude module: "spring-boot-starter-tomcat"
         exclude module: "slf4j-log4j12"
+        exclude module: 'junit'
     }
-
-    developmentOnly
-
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-
     compileOnly {
         extendsFrom annotationProcessor
     }
 }
 
 
-springBoot {
-    buildInfo()
-}
-
-// gradle 的 Property Expansion 的占位符 ${..} 与 springboot 的占位符 冲突， springboot 的需要转义 \${..}
-processResources {
-    filesMatching("application.yaml") {
-        expand(project.properties)
+bootJar {
+    manifest {
+        attributes("Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion)
     }
 }
 
 ext {
-    hutoolVersion = "5.2.3"
+    hutoolVersion = "5.3.8"
     upyunSdkVersion = "4.2.0"
-    qiniuSdkVersion = "7.2.28"
-    aliyunSdkVersion = "3.8.1"
+    qiniuSdkVersion = "7.2.29"
+    aliyunSdkVersion = "3.9.1"
     baiduSdkVersion = "0.10.36"
-    qcloudSdkVersion = "5.6.18"
+    qcloudSdkVersion = "5.6.25"
     swaggerVersion = "2.9.2"
-    commonsLangVersion = "3.9"
+    commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
-    dataformatYamlVersion = "2.10.3"
+    dataformatYamlVersion = "2.11.0"
     jgitVersion = "5.7.0.202003110725-r"
-    flexmarkVersion = "0.60.2"
+    flexmarkVersion = "0.62.2"
     thumbnailatorVersion = "0.4.11"
     image4jVersion = "0.7zensight1"
-    flywayVersion = "6.3.1"
+    flywayVersion = "6.5.0"
     h2Version = "1.4.196"
     levelDbVersion = "0.12"
-    jsonVersion = "20190722"
-    fastJsonVersion = "1.2.67"
-    annotationsVersion = "3.0.1"
+    annotationsVersion = "3.0.1u2"
+    jedisVersion = "3.3.0"
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
+    githubApiVersion = "1.84"
+    powermockVersion = "1.6.6"
+    powermockApiMockito2 = "2.0.7"
+    hzVersion = "3.12"
 }
 
 dependencies {
+    // 额外引入包
+    implementation "com.alibaba:fastjson:1.2.73"
+    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2.2.0.RELEASE"
+    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.1.RELEASE"
+
+    implementation "org.kohsuke:github-api:$githubApiVersion"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-freemarker"
-    implementation "com.sun.mail:jakarta.mail"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    implementation "com.sun.mail:jakarta.mail"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
     implementation "cn.hutool:hutool-extra:$hutoolVersion"
-    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2.2.0.RELEASE"
-    implementation "com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.1.RELEASE"
     implementation "com.upyun:java-sdk:$upyunSdkVersion"
     implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
     implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
@@ -120,21 +116,17 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-ext-superscript:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
-//    implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
 
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
-
-    implementation "org.json:json:$jsonVersion"
-    implementation "com.alibaba:fastjson:$fastJsonVersion"
-
     implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    implementation "redis.clients:jedis:$jedisVersion"
+    implementation "com.hazelcast:hazelcast-all:$hzVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
-
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
@@ -142,7 +134,11 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok"
     testAnnotationProcessor "org.projectlombok:lombok"
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+//    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
+//    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }

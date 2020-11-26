@@ -10,7 +10,6 @@ import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,40 +85,40 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Lists previous posts.
      *
-     * @param date date must not be null
+     * @param post post must not be null
      * @param size previous max post size
      * @return a list of previous post
      */
     @NonNull
-    List<POST> listPrevPosts(@NonNull Date date, int size);
+    List<POST> listPrevPosts(@NonNull POST post, int size);
 
     /**
      * Lits next posts.
      *
-     * @param date date must not be null
+     * @param post post must not be null
      * @param size next max post size
      * @return a list of next post
      */
     @NonNull
-    List<POST> listNextPosts(@NonNull Date date, int size);
+    List<POST> listNextPosts(@NonNull POST post, int size);
 
     /**
      * Gets previous post.
      *
-     * @param date date must not be null
+     * @param post post must not be null
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getPrevPost(@NonNull Date date);
+    Optional<POST> getPrevPost(@NonNull POST post);
 
     /**
      * Gets next post.
      *
-     * @param date date must not be null
+     * @param post post must not be null
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getNextPost(@NonNull Date date);
+    Optional<POST> getNextPost(@NonNull POST post);
 
     /**
      * Pages latest posts.
@@ -149,6 +148,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     Page<POST> pageBy(@NonNull Pageable pageable);
 
     /**
+     * Increases post visits.
+     *
+     * @param visits visits must not be less than 1
+     * @param postId post id must not be null
+     */
+    void increaseVisit(long visits, @NonNull Integer postId);
+
+    /**
      * Lists by status.
      *
      * @param status   post status must not be null
@@ -157,14 +164,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     Page<POST> pageBy(@NonNull PostStatus status, @NonNull Pageable pageable);
-
-    /**
-     * Increases post visits.
-     *
-     * @param visits visits must not be less than 1
-     * @param postId post id must not be null
-     */
-    void increaseVisit(long visits, @NonNull Integer postId);
 
     /**
      * Increase post likes.

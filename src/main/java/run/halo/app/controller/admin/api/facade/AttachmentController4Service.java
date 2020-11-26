@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,43 +33,40 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RefreshScope
 public class AttachmentController4Service {
-    private static HttpClient client = HttpClient.newBuilder().build();
+    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS");
+    private static final HttpClient CLIENT = HttpClient.newBuilder().build();
 
     private final AttachmentService attachmentService;
-    @Value("${halo.upload.user:lmy}")
+    @Value("${halo.upload.user}")
     private String user;
-    @Value("${halo.upload.pwd:123lmy}")
+    @Value("${halo.upload.pwd}")
     private String pwd;
 
-    public void print() {
-        System.out.println("user:" + user + "  pwd:" + pwd);
-    }
 
     public AttachmentController4Service(AttachmentService attachmentService) {
         this.attachmentService = attachmentService;
+    }
+
+    @GetMapping("/testConfig")
+    public String testConfig() {
+        return user + "  " + pwd;
     }
 
     @PostMapping("/facade/uploadImg")
     @ApiOperation("对外开放的文件上传接口")
     @ApiImplicitParams({@ApiImplicitParam(name = "url", value = "需要上传的图片文件地址")})
     public String uploadAttachment(@RequestParam("data") String data) throws Exception {
-        print();
         ImgFileDTO fileDTO = new ImgFileDTO();
         fileDTO.setData(data);
-        String imgUrl;
-        try {
-            imgUrl = fileDTO.service(user, pwd);
-            if (Objects.isNull(imgUrl)) {
-                return JSON.toJSONString(Resp.fail("鉴权失败！"));
-            }
-        } catch (Exception e) {
-            return JSON.toJSONString(Resp.fail(e.getMessage()));
+        String imgUrl = fileDTO.service(user, pwd);
+        if (Objects.isNull(imgUrl)) {
+            return JSON.toJSONString(Resp.fail("鉴权失败！"));
         }
 
         HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(imgUrl)).build();
-        HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray());
         //上传图片
-        String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
+        String format = LocalDateTime.now().format(FORMAT);
         MockMultipartFile multipartFile = new MockMultipartFile("file", format + ".jpg", "image/jpeg", response.body());
         CompletableFuture.runAsync(() -> attachmentService.upload(multipartFile));
         return JSON.toJSONString(Resp.success());

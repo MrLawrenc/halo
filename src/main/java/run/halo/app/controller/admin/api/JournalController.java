@@ -72,4 +72,24 @@ public class JournalController {
         Journal deletedJournal = journalService.removeById(journalId);
         return journalService.convertTo(deletedJournal);
     }
+
+
+    @GetMapping
+    @ApiOperation("heart")
+    public String heart() {
+        return "喜欢";
+    }
+
+    @GetMapping
+    @ApiOperation("share")
+    public String share() {
+        return "分享";
+    }
+
+    @GetMapping
+    @ApiOperation("comment")
+    public String comment() {
+        return "评论";
+    }
+
 }

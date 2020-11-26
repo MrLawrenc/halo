@@ -1,10 +1,12 @@
+# 本地测试使用配置 使用mysql，可以更换datasource节点，并注释掉h2配置即可
 server:
   port: 8090
   forward-headers-strategy: native
   compression:
     enabled: false
 spring:
-
+  application:
+    name: halo-blog-local
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   devtools:
@@ -14,9 +16,9 @@ spring:
       enabled: always
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://47.96.158.220:13306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#    username: root
-#    password: "@123lmyLMY."
+#    url: jdbc:mysql://ip:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+#    username: 账号
+#    password: "密码"
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
@@ -58,9 +60,6 @@ logging:
 
 halo:
   download-timeout: 5m
-  upload:
-    user: lmy
-    pwd: 123456
 
 application:
   version: ${version}

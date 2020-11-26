@@ -2,12 +2,12 @@ package run.halo.app.cache.mars;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.utils.LogUtil;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -15,9 +15,12 @@ import java.util.function.Supplier;
 /**
  * @author : MrLawrenc
  * @date : 2020/4/22 23:07
- * @description :   缓存key相关枚举
+ * 缓存key相关枚举
+ * <p>
+ * 作缓存主要是由于数据库连接的是内网穿透后的内网数据库，比较慢
  */
 @Component
+@Slf4j
 public class CacheUtil {
 
     private static final Cache<String, Object> BLOG_INDEX_CACHE = CacheBuilder.newBuilder()
@@ -66,11 +69,11 @@ public class CacheUtil {
         String key = status.getValue() + ":" + startPage + ":" + pageSize;
         Page<PostListVO> result = (Page<PostListVO>) BLOG_INDEX_CACHE.getIfPresent(key);
         if (Objects.isNull(result)) {
-            LogUtil.debugLog("未命中缓存................");
+            log.debug("未命中缓存................");
             result = supplier.get();
             BLOG_INDEX_CACHE.put(key, result);
         } else {
-            LogUtil.debugLog("命中缓存.................");
+            log.debug("命中缓存.................");
         }
         return result;
     }

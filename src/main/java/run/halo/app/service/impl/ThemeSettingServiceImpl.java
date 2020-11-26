@@ -4,6 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Example;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,8 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     private final Configuration configuration;
 
     public ThemeSettingServiceImpl(ThemeSettingRepository themeSettingRepository,
-                                   ThemeService themeService,
-                                   Configuration configuration) {
+            ThemeService themeService,
+            Configuration configuration) {
         super(themeSettingRepository);
         this.themeSettingRepository = themeSettingRepository;
         this.themeService = themeService;
@@ -87,7 +88,10 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
                     log.debug("Creating theme setting: [{}]", setting);
                     return setting;
                 });
-
+        // Determine whether the data already exists
+        if (themeSettingRepository.findOne(Example.of(themeSetting)).isPresent()) {
+            return null;
+        }
         // Save the theme setting
         return themeSettingRepository.save(themeSetting);
     }
@@ -99,11 +103,7 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         if (CollectionUtils.isEmpty(settings)) {
             return;
         }
-        settings.forEach((k, v) -> {
-            if (Objects.isNull(v)) {
-                settings.remove(k, null);
-            }
-        });
+
         // Save the settings
         settings.forEach((key, value) -> save(key, value.toString(), themeId));
 
