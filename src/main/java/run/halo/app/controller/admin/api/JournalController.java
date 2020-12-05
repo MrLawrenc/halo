@@ -74,21 +74,20 @@ public class JournalController {
     }
 
 
-    @GetMapping
+    @PostMapping("/heart/"+"{journalId:\\d+}")
     @ApiOperation("heart")
-    public String heart() {
+    public String heart(@PathVariable("journalId") Integer journalId) {
         return "喜欢";
     }
 
-    @GetMapping
+    @PostMapping("/share/"+"{journalId:\\d+}")
     @ApiOperation("share")
-    public String share() {
+    public String share(@PathVariable("journalId") Integer journalId) {
         return "分享";
     }
 
-    @GetMapping
-    @ApiOperation("comment")
-    public String comment() {
+    @PostMapping("/comment/"+"{journalId:\\d+}")
+    public String comment(@PathVariable("journalId") Integer journalId) {
         return "评论";
     }
 

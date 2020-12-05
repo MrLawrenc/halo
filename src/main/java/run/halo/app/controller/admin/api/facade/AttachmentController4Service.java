@@ -1,3 +1,4 @@
+/*
 package run.halo.app.controller.admin.api.facade;
 
 import com.alibaba.fastjson.JSON;
@@ -24,12 +25,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+*/
 /**
  * @author : MrLawrenc
  * @date : 2020/5/5 15:38
  * @description : 暴露给外部调用的上传图片接口
  * 不走api接口，越过鉴权过滤器
- */
+ *//*
+
 @RestController
 @RefreshScope
 public class AttachmentController4Service {
@@ -71,4 +74,4 @@ public class AttachmentController4Service {
         CompletableFuture.runAsync(() -> attachmentService.upload(multipartFile));
         return JSON.toJSONString(Resp.success());
     }
-}
+}*/

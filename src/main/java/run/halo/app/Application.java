@@ -16,8 +16,8 @@ import run.halo.app.repository.base.BaseRepositoryImpl;
  *
  * @author ryanwang
  * @date 2017-11-14
- *
- * 新港本地测试账号密码: TEST 123456789
+ * git fetch upstream 同步上游仓库
+ * 新港本地测试账号密码: test testtest test@163.com
  */
 @SpringBootApplication(exclude = { MultipartAutoConfiguration.class })
 @EnableAsync
