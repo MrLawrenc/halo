@@ -2,11 +2,13 @@ package run.halo.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 
 /**
@@ -17,8 +19,9 @@ import run.halo.app.repository.base.BaseRepositoryImpl;
  *
  * 新港本地测试账号密码: TEST 123456789
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = { MultipartAutoConfiguration.class })
 @EnableAsync
+@EnableScheduling
 @EnableDiscoveryClient
 @EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application extends SpringBootServletInitializer {
